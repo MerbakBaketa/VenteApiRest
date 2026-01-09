@@ -5,3 +5,4 @@ flask-migrate
 flask-marshmallow
 marshmallow-sqlalchemy
 waitress
+flask_jwt_extended
