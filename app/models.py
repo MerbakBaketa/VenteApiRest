@@ -8,6 +8,18 @@ Base = declarative_base()
 db = SQLAlchemy(model_class=Base)
 
 
+class User(db.Model):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True)
+    username = Column(String(80), unique=True, nullable=False)
+    email = Column(String(120), unique=True, nullable=False)
+    password = Column(String(200), nullable=False)
+
+    def __repr__(self):
+        return f"<User {self.username}>"
+
+
 class Product(db.Model):
     __tablename__ = "produits"
 
