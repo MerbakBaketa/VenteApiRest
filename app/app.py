@@ -2,7 +2,7 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_restful import Api
 from app.models import *
-from app.resources import ProductListResource,UserRegisterResource,UserLoginResource,ProtectedResource
+from app.resources import ProductListResource,UserRegisterResource,UserLoginResource,ProtectedResource, clientListResource
 from app.shemas import ma
 from datetime import datetime
 from flask_jwt_extended import JWTManager
@@ -23,6 +23,7 @@ migrate = Migrate(app, db)
 api = Api(app)
 jwt = JWTManager(app)
 api.add_resource(ProductListResource, "/products", "/products/<string:product_id>")
+api.add_resource(clientListResource, "/clients", "/clients/<string:client_id>")
 api.add_resource(UserRegisterResource, "/register")
 api.add_resource(UserLoginResource, "/login")
 api.add_resource(ProtectedResource, "/secure")
