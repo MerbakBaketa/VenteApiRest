@@ -1,8 +1,8 @@
 from flask import request
-from flask_restful import Resource, Api
+from flask_restful import Resource 
 from marshmallow import ValidationError
-from app.models import db, Product, User
-from app.shemas import ProductSchema, UserSchema
+from app.models import db, Product, User, Client
+from app.shemas import ProductSchema, UserSchema, ClientSchema
 from flask_jwt_extended import create_access_token ,jwt_required, get_jwt_identity
 
 class UserRegisterResource(Resource):
@@ -114,5 +114,70 @@ class ProductListResource(Resource):
     def delete(self, product_id):
         product = Product.query.get_or_404(product_id)
         db.session.delete(product)
+        db.session.commit()
+        return "", 204
+
+class clientListResource(Resource):
+    client_schema = ClientSchema()
+    client_list_schema = ClientSchema(many=True)
+    client_patch_schema = ClientSchema(partial=True)
+
+    def get(self, client_id=None):
+        if client_id:
+            client = Client.query.get(client_id)
+            return self.client_schema.dump(client)
+        else:
+            clients = Client.query.all()
+            return self.client_list_schema.dump(clients)
+
+    def post(self):
+        try:
+            new_client_data = self.client_schema.load(request.get_json())
+        except ValidationError as err:
+            return {"message": "Validation error", "errors": err.messages}, 400
+        new_client = Client(
+            code_client=new_client_data["code_client"],
+            nom=new_client_data["nom"],
+            email=new_client_data["email"],
+            telephone=new_client_data["telephone"],
+        )
+        db.session.add(new_client)
+        db.session.commit()
+
+        return self.client_schema.dump(new_client), 201
+
+    def put(self, client_id):
+        try:
+            new_client_data = self.client_schema.load(request.get_json())
+        except ValidationError as err:
+            return {"message": "Validation error", "errors": err.messages}, 400
+
+        client = Client.query.get_or_404(client_id)
+
+        for key, value in new_client_data.items():
+            if value is not None:
+                setattr(client, key, value)
+
+        db.session.commit()
+        return self.client_schema.dump(client), 200
+
+    def patch(self, client_id):
+        try:
+            new_client_data = self.client_patch_schema.load(request.get_json())
+        except ValidationError as err:
+            return {"message": "Validation error", "errors": err.messages}, 400
+
+        client = Client.query.get_or_404(client_id)
+
+        for key, value in new_client_data.items():
+            if value is not None:
+                setattr(client, key, value)
+
+        db.session.commit()
+        return self.client_patch_schema.dump(client), 200
+
+    def delete(self, client_id):
+        client = Client.query.get_or_404(client_id)
+        db.session.delete(client)
         db.session.commit()
         return "", 204
