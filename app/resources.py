@@ -1,12 +1,28 @@
 from flask import request
-from flask_restful import Resource 
+from flask_restful import Resource
 from marshmallow import ValidationError
 from app.models import db, Product, User, Client
 from app.shemas import ProductSchema, UserSchema, ClientSchema
-from flask_jwt_extended import create_access_token ,jwt_required, get_jwt_identity
+from app.permission import RoleProtectedResource, role_required
+from flask_jwt_extended import (
+    create_access_token,
+    get_jwt,
+    jwt_required,
+    get_jwt_identity,
+)
+
 
 class UserRegisterResource(Resource):
     user_schema = UserSchema()
+    user_list_schema = UserSchema(many=True)
+
+    def get(self, user_id=None):
+        if user_id:
+            user = User.query.get(user_id)
+            return self.user_schema.dump(user)
+        else:
+            users = User.query.all()
+            return self.user_list_schema.dump(users)
 
     def post(self):
         try:
@@ -28,8 +44,10 @@ class UserRegisterResource(Resource):
 
         return self.user_schema.dump(new_user), 201
 
+
 class UserLoginResource(Resource):
     user_schema = UserSchema()
+
     def post(self):
         try:
             login_data = self.user_schema.load(request.get_json(), partial=("email",))
@@ -41,15 +59,35 @@ class UserLoginResource(Resource):
         user = User.query.filter_by(username=username).first()
 
         if user and user.password == password:
-            acces_token= create_access_token(identity=str(user.id))
-            return { "access_token": acces_token}, 200
+            acces_token = create_access_token(
+                identity=str(user.id),
+                additional_claims={"username": user.username, "role": user.role},
+            )
+            return {"access_token": acces_token}, 200
         return {"message": "Invalid credentials"}, 401
+
 
 class ProtectedResource(Resource):
     @jwt_required()
     def get(self):
         current_user_id = get_jwt_identity()
-        return {"message": f"This is a protected resource : {current_user_id}"}, 200
+        username = get_jwt()["username"]
+        role = get_jwt()["role"]
+        return {
+            "message": f"This is a protected resource : {current_user_id}, {username}, {role}"
+        }, 200
+
+
+class AdminResource(RoleProtectedResource):
+    allowed_roles = ["Admin"]
+
+
+class ManagerResource(RoleProtectedResource):
+    allowed_roles = ["Manager", "Admin"]
+
+
+class VendeurResource(RoleProtectedResource):
+    allowed_roles = ["Vendeur", "Admin"]
 class ProductListResource(Resource):
     product_schema = ProductSchema()
     product_list_schema = ProductSchema(many=True)
@@ -116,6 +154,7 @@ class ProductListResource(Resource):
         db.session.delete(product)
         db.session.commit()
         return "", 204
+
 
 class clientListResource(Resource):
     client_schema = ClientSchema()
