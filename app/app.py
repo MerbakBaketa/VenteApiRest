@@ -2,11 +2,18 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_restful import Api
 from app.models import *
-from app.resources import *
-from app.shemas import ma
+from resources import (
+    CommandeResource,
+    ComporterResource,
+    ProductResource,
+    UserRegisterResource,
+    UserLoginResource,
+    ProtectedResource,
+    ClientResource,
+)
+from app.schemas import ma
 from datetime import datetime
 from flask_jwt_extended import JWTManager
-
 
 app = Flask(__name__)
 
@@ -18,11 +25,13 @@ db.init_app(app)
 ma.init_app(app)
 migrate = Migrate(app, db)
 
-
 api = Api(app)
 jwt = JWTManager(app)
-api.add_resource(ProductListResource, "/products", "/products/<string:product_id>")
-api.add_resource(clientListResource, "/clients", "/clients/<string:client_id>")
+api.add_resource(ProductResource, "/products", "/products/<string:product_id>")
+api.add_resource(ClientResource, "/clients", "/clients/<string:client_id>")
+api.add_resource(CommandeResource, "/commandes", "/commandes/<string:commande_id>")
+api.add_resource(ComporterResource, "/comporters", "/comporters/<string:comporter_id>")
+
 api.add_resource(UserRegisterResource, "/register")
 api.add_resource(UserLoginResource, "/login")
 api.add_resource(AdminResource, "/Admin")
@@ -301,7 +310,7 @@ with app.app_context():
             ],
             ["CMD005", "P008", 3259.99, 1, 3259.99],
         )
-
-        app.run(debug=True)
+        if __name__ == "__main__":
+            app.run(debug=True)
     except Exception as e:
         print(f"An error occurred: {e}")

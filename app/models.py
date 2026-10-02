@@ -41,6 +41,7 @@ class Client(db.Model):
     nom = Column(String(100), nullable=False)
     email = Column(String(120), unique=True, nullable=False)
     telephone = Column(String(20))
+    createAt = Column(DateTime, default=datetime.utcnow)
 
     commandes = db.relationship("Commande", backref="client", lazy=True)
 
@@ -55,6 +56,7 @@ class Commande(db.Model):
     date_commande = Column(DateTime, default=datetime.utcnow)
     status = Column(String(50), nullable=False)
     code_client = Column(String(100), ForeignKey("clients.code_client"), nullable=False)
+    CreateAt = Column(DateTime, default=datetime.utcnow)
     produits = db.relationship("Comporter", backref="commande", lazy=True)
 
     def __repr__(self):
@@ -74,6 +76,7 @@ class Comporter(db.Model):
     prix_unitaire = Column(Float, nullable=False)
     sous_total = Column(Float, nullable=False)
     produit = db.relationship("Product")
+    createAt = Column(DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return f"<Comporter cmd={self.commande_code} prod={self.produit_code}>"
