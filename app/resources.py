@@ -102,19 +102,23 @@ class ProductListResource(Resource):
     product_patch_schema = ProductSchema(partial=True)
 class ProductResource(GenericCrudResource):
     model = Product
+    key_field = "code"
     schema = ProductSchema
     database = db
 
 
 class ClientResource(GenericCrudResource):
     model = Client
+    key_field = "code_client"
     schema = ClientSchema
     database = db
 class CommandeResource(GenericCrudResource):
     model = Commande
+    key_field = "commande_code"
     schema = CommandeSchema
     database = db
 class ComporterResource(GenericCrudResource):
     model = Comporter
+    key_field = "id"
     schema = ComporterSchema
     database = db
