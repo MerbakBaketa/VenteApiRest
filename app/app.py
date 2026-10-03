@@ -2,11 +2,10 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_restful import Api
 from app.models import *
-from app.resources import ProductListResource,UserRegisterResource,UserLoginResource,ProtectedResource, clientListResource
+from app.resources import *
 from app.shemas import ma
 from datetime import datetime
 from flask_jwt_extended import JWTManager
-
 
 
 app = Flask(__name__)
@@ -26,7 +25,10 @@ api.add_resource(ProductListResource, "/products", "/products/<string:product_id
 api.add_resource(clientListResource, "/clients", "/clients/<string:client_id>")
 api.add_resource(UserRegisterResource, "/register")
 api.add_resource(UserLoginResource, "/login")
-api.add_resource(ProtectedResource, "/secure")
+api.add_resource(AdminResource, "/Admin")
+api.add_resource(ManagerResource, "/Manager")
+api.add_resource(VendeurResource, "/Vendeur")
+# api.add_resource(ProtectedResource, "/secure")
 
 
 with app.app_context():
