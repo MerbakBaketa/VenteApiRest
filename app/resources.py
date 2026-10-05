@@ -2,7 +2,6 @@ from flask import request
 from flask_restful import Resource
 from marshmallow import ValidationError
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token, get_jwt, jwt_required, get_jwt_identity
 from app.models import Comporter, db, Product, User, Client, Commande
 from app.permission import RoleProtectedResource, role_required
 from app.schemas import (
@@ -12,7 +11,12 @@ from app.schemas import (
     CommandeSchema,
     ComporterSchema,
 )
-
+from flask_jwt_extended import (
+    create_access_token,
+    get_jwt,
+    jwt_required,
+    get_jwt_identity,
+)
 from utils_dev.generic_class import GenericCrudResource
 
 
@@ -76,7 +80,10 @@ class UserLoginResource(Resource):
 
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
-            acces_token = create_access_token( identity=str(user.id), additional_claims={"username": user.username, "role": user.role},)
+            acces_token = create_access_token(
+                identity=str(user.id),
+                additional_claims={"username": user.username, "role": user.role},
+            )
             return {"access_token": acces_token}, 200
         return {"message": "Invalid credentials"}, 401
 
@@ -90,16 +97,26 @@ class ProtectedResource(Resource):
         return {
             "message": f"This is a protected resource : {current_user_id}, {username}, {role}"
         }, 200
+
+
 class AdminResource(RoleProtectedResource):
     allowed_roles = ["Admin"]
+
+
 class ManagerResource(RoleProtectedResource):
     allowed_roles = ["Manager", "Admin"]
+
+
 class VendeurResource(RoleProtectedResource):
     allowed_roles = ["Vendeur", "Admin"]
+
+
 class ProductListResource(Resource):
     product_schema = ProductSchema()
     product_list_schema = ProductSchema(many=True)
     product_patch_schema = ProductSchema(partial=True)
+
+
 class ProductResource(GenericCrudResource):
     model = Product
     key_field = "code"
@@ -112,11 +129,15 @@ class ClientResource(GenericCrudResource):
     key_field = "code_client"
     schema = ClientSchema
     database = db
+
+
 class CommandeResource(GenericCrudResource):
     model = Commande
     key_field = "commande_code"
     schema = CommandeSchema
     database = db
+
+
 class ComporterResource(GenericCrudResource):
     model = Comporter
     key_field = "id"

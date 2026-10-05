@@ -29,6 +29,7 @@ class CommandeSchema(ma.SQLAlchemyAutoSchema):
 
     client = ma.Nested(ClientSchema, many=False)
     lignes_commande = ma.Nested("ComporterSchema", many=True)
+
     class Meta:
         model = Commande
         include_fk = True
@@ -38,6 +39,7 @@ class CommandeSchema(ma.SQLAlchemyAutoSchema):
 
 class ComporterSchema(ma.SQLAlchemyAutoSchema):
     produit = ma.Nested(ProductSchema, many=False)
+
     class Meta:
         model = Comporter
         include_fk = True

@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import declarative_base
 
-
 Base = declarative_base()
 
 db = SQLAlchemy(model_class=Base)
@@ -31,7 +30,7 @@ class Product(db.Model):
     qte = Column(Integer, nullable=False)
     categorie = Column(String(255))
 
-    lignes_commande = db.relationship("Comporter", back_populates="produit",lazy=True)
+    lignes_commande = db.relationship("Comporter", back_populates="produit", lazy=True)
 
     def __repr__(self):
         return f"<Product(name={self.name}, prix={self.prix})>"
@@ -46,11 +45,7 @@ class Client(db.Model):
     telephone = Column(String(20))
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    commande = db.relationship(
-        "Commande",
-        back_populates="client",
-        lazy=True
-    )
+    commande = db.relationship("Commande", back_populates="client", lazy=True)
 
     def __repr__(self):
         return f"<Client {self.nom}>"
@@ -71,17 +66,9 @@ class Commande(db.Model):
 
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    client = db.relationship(
-        "Client",
-        back_populates="commande",
-        lazy=True
-    )
+    client = db.relationship("Client", back_populates="commande", lazy=True)
 
-    lignes_commande = db.relationship(
-        "Comporter",
-        back_populates="commande",
-        lazy=True
-    )
+    lignes_commande = db.relationship("Comporter", back_populates="commande", lazy=True)
 
     def __repr__(self):
         return f"<Commande {self.commande_code}>"
@@ -109,29 +96,16 @@ class Comporter(db.Model):
     sous_total = Column(Float, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    commande = db.relationship(
-        "Commande",
-        back_populates="lignes_commande",
-        lazy=True
-    )
+    commande = db.relationship("Commande", back_populates="lignes_commande", lazy=True)
 
-    produit = db.relationship(
-        "Product",
-        back_populates="lignes_commande",
-        lazy=True
-    )
+    produit = db.relationship("Product", back_populates="lignes_commande", lazy=True)
 
     def __repr__(self):
-        return (
-            f"<Comporter cmd={self.commande_code} "
-            f"prod={self.produit_code}>"
-        )
+        return f"<Comporter cmd={self.commande_code} " f"prod={self.produit_code}>"
 
 
 def ajouter_donnees_initiales(entite, colonnes, valeurs):
-    nouvel_enregistrement = entite(
-        **dict(zip(colonnes, valeurs))
-    )
+    nouvel_enregistrement = entite(**dict(zip(colonnes, valeurs)))
 
     db.session.add(nouvel_enregistrement)
     db.session.commit()

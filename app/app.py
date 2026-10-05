@@ -3,6 +3,7 @@ from flask_migrate import Migrate
 from flask_restful import Api
 from app.models import *
 from resources import (
+    AdminResource,
     CommandeResource,
     ComporterResource,
     ProductResource,
@@ -10,6 +11,8 @@ from resources import (
     UserLoginResource,
     ProtectedResource,
     ClientResource,
+    ManagerResource,
+    VendeurResource,
 )
 from app.schemas import ma
 from datetime import datetime
@@ -43,7 +46,6 @@ api.add_resource(VendeurResource, "/Vendeur")
 with app.app_context():
 
     try:
-        db.drop_all()
         db.create_all()
         print("Database and tables created successfully.")
 
