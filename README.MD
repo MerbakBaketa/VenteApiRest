@@ -10,3 +10,7 @@ I. migration de la BD
     flask db migrate -m "Ajout nouvelles colonnes"
     f/ flask db upgrade
     g/ Vérification : flask db current
+
+II. after clone repository running : 
+    pip install -r requirements.txt
+    runnig flask application flask --app app run --debug

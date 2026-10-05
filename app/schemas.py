@@ -21,19 +21,27 @@ class ProductSchema(ma.SQLAlchemyAutoSchema):
 class ClientSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Client
-        load_instance = False
+        load_instance = True
         sqla_session = db.session
 
 
 class CommandeSchema(ma.SQLAlchemyAutoSchema):
+
+    client = ma.Nested(ClientSchema, many=False)
+    lignes_commande = ma.Nested("ComporterSchema", many=True)
+
     class Meta:
         model = Commande
-        load_instance = False
+        include_fk = True
+        load_instance = True
         sqla_session = db.session
 
 
 class ComporterSchema(ma.SQLAlchemyAutoSchema):
+    produit = ma.Nested(ProductSchema, many=False)
+
     class Meta:
         model = Comporter
-        load_instance = False
+        include_fk = True
+        load_instance = True
         sqla_session = db.session

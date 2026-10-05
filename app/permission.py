@@ -18,6 +18,7 @@ def role_required(allowed_roles, key_role="role"):
 
     return decorator
 
+
 class RoleProtectedResource(Resource):
     allowed_roles = []
     method_decorators = []
